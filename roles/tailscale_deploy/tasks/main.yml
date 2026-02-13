@@ -1,0 +1,26 @@
+---
+- name: "tailscale | Display target system information"
+  ansible.builtin.debug:
+    msg: |
+      Target System Information:
+        Hostname: {{ ansible_hostname }}
+        Distribution: {{ ansible_distribution }} {{ ansible_distribution_version }}
+        OS Family: {{ ansible_os_family }}
+        IP Address: {{ ansible_default_ipv4.address }}
+
+- name: "tailscale | Validate required variables"
+  ansible.builtin.assert:
+    that:
+      - tailscale_auth_key is defined
+      - tailscale_auth_key | length > 0
+    fail_msg: "tailscale_auth_key must be defined and not empty. Please set it in Semaphore environment variables."
+    success_msg: "Required variables are present."
+
+- name: "tailscale | Include installation tasks"
+  ansible.builtin.include_tasks: install.yml
+
+- name: "tailscale | Include configuration tasks"
+  ansible.builtin.include_tasks: configure.yml
+
+- name: "tailscale | Include status check tasks"
+  ansible.builtin.include_tasks: status.yml

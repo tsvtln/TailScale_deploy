@@ -1,0 +1,25 @@
+---
+# defaults file for tailscale_deploy
+
+# Tailscale authentication key (should be provided via Semaphore environment variables)
+# tailscale_auth_key: ""
+
+# Tailscale API key (should be provided via Semaphore environment variables)
+# tailscale_api_key: ""
+
+# Custom hostname for Tailscale
+# If not set, will use: {{ ansible_hostname }}-{{ ansible_distribution | lower }}
+tailscale_hostname: ""
+
+# Tailscale installation script URL
+tailscale_install_url: "https://tailscale.com/install.sh"
+
+# Additional Tailscale up flags
+tailscale_extra_flags: ""
+
+# Accept routes advertised by other nodes
+tailscale_accept_routes: false
+
+# Accept DNS configuration from Tailscale
+tailscale_accept_dns: true
+

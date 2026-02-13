@@ -1,0 +1,58 @@
+---
+- name: "tailscale | Set default hostname if not provided"
+  ansible.builtin.set_fact:
+    computed_hostname: "{{ tailscale_hostname if tailscale_hostname | length > 0 else ansible_hostname + '-' + ansible_distribution | lower }}"
+
+- name: "tailscale | Display hostname configuration"
+  ansible.builtin.debug:
+    msg: "Tailscale will be configured with hostname: {{ computed_hostname }}"
+
+- name: "tailscale | Check current Tailscale status"
+  ansible.builtin.command: tailscale status --json
+  register: tailscale_status_check
+  changed_when: false
+  failed_when: false
+
+- name: "tailscale | Parse Tailscale status"
+  ansible.builtin.set_fact:
+    tailscale_is_connected: "{{ (tailscale_status_check.stdout | from_json).BackendState == 'Running' if tailscale_status_check.rc == 0 and tailscale_status_check.stdout | length > 0 else False }}"
+  when: tailscale_status_check.rc == 0
+
+- name: "tailscale | Set connection status for failed checks"
+  ansible.builtin.set_fact:
+    tailscale_is_connected: False
+  when: tailscale_status_check.rc != 0
+
+- name: "tailscale | Display current connection status"
+  ansible.builtin.debug:
+    msg: "Tailscale is {{ 'already connected' if tailscale_is_connected else 'not connected' }}"
+
+- block:
+  - name: "tailscale | Build Tailscale up command"
+    ansible.builtin.set_fact:
+      tailscale_up_command: >-
+        tailscale up
+        --authkey={{ tailscale_auth_key }}
+        --hostname={{ computed_hostname }}
+        {{ '--accept-routes' if tailscale_accept_routes else '' }}
+        {{ '--accept-dns=' + (tailscale_accept_dns | string | lower) }}
+        {{ tailscale_extra_flags }}
+
+  - name: "tailscale | Connect to Tailscale network"
+    ansible.builtin.shell: "{{ tailscale_up_command }}"
+    register: tailscale_up_result
+    changed_when: true
+    no_log: true  # Don't log the auth key
+
+  - name: "tailscale | Display connection result"
+    ansible.builtin.debug:
+      msg: "Successfully connected to Tailscale network with hostname: {{ computed_hostname }}"
+
+  when: not tailscale_is_connected
+
+- name: "tailscale | Tailscale already connected"
+  ansible.builtin.debug:
+    msg: "Tailscale is already connected and running"
+  when: tailscale_is_connected
+
+

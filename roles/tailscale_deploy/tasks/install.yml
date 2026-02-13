@@ -1,0 +1,44 @@
+---
+- name: "tailscale | Check if Tailscale is already installed"
+  ansible.builtin.command: which tailscale
+  register: tailscale_installed
+  changed_when: false
+  failed_when: false
+
+- name: "tailscale | Display installation status"
+  ansible.builtin.debug:
+    msg: "Tailscale is {{ 'already installed' if tailscale_installed.rc == 0 else 'not installed' }}"
+
+- block:
+  - name: "tailscale | Download Tailscale installation script"
+    ansible.builtin.get_url:
+      url: "{{ tailscale_install_url }}"
+      dest: /tmp/tailscale_install.sh
+      mode: '0755'
+    register: download_result
+
+  - name: "tailscale | Execute Tailscale installation script"
+    ansible.builtin.shell: sh /tmp/tailscale_install.sh
+    args:
+      creates: /usr/bin/tailscale
+    register: install_result
+
+  - name: "tailscale | Display installation result"
+    ansible.builtin.debug:
+      msg: "Tailscale installation completed successfully"
+    when: install_result.changed
+
+  - name: "tailscale | Clean up installation script"
+    ansible.builtin.file:
+      path: /tmp/tailscale_install.sh
+      state: absent
+
+  when: tailscale_installed.rc != 0
+
+- name: "tailscale | Ensure Tailscale service is enabled"
+  ansible.builtin.systemd:
+    name: tailscaled
+    enabled: yes
+    state: started
+  become: yes
+

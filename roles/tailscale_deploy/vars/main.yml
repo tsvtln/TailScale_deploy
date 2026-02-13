@@ -1,0 +1,10 @@
+---
+# vars file for tailscale_deploy
+
+# These variables should be set in Semaphore UI as environment variables:
+# - tailscale_auth_key: Your Tailscale authentication key
+# - tailscale_api_key: Your Tailscale API key (for future API operations)
+
+# You can also set custom hostname via Semaphore extra variables:
+# - tailscale_hostname: Custom hostname for this node (optional)
+
