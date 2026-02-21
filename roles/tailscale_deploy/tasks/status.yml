@@ -25,7 +25,7 @@
     tailscale_info: "{{ tailscale_status_json.stdout | from_json }}"
   when: tailscale_status_json.rc == 0
 
-- name: "tailscale | Display Tailscale Status"
+- name: "tailscale | Job Summary Output"
   ansible.builtin.debug:
     msg: |
       ============================================
