@@ -42,7 +42,7 @@
     ansible.builtin.shell: "{{ tailscale_up_command }}"
     register: tailscale_up_result
     changed_when: true
-    no_log: true  # Don't log the auth key
+    no_log: false  # Don't log the auth key
 
   - name: "tailscale | Display connection result"
     ansible.builtin.debug:
