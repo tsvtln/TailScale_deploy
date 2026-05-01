@@ -19,6 +19,9 @@
 - name: "tailscale | Include installation tasks"
   ansible.builtin.include_tasks: install.yml
 
+- name: "tailscale | Include default configuration tasks"
+  ansible.builtin.include_tasks: default_config.yml
+
 - name: "tailscale | Include configuration tasks"
   ansible.builtin.include_tasks: configure.yml
 

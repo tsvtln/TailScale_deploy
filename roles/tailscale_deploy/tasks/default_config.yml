@@ -1,0 +1,32 @@
+---
+- name: "tailscale | Configure /etc/default/tailscaled"
+  ansible.builtin.copy:
+    content: |
+      PORT="41641"
+      FLAGS="--no-logs-no-support"
+      TS_NO_LOGS_NO_SUPPORT=true
+    dest: /etc/default/tailscaled
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  register: tailscaled_config_result
+
+- name: "tailscale | Display configuration result"
+  ansible.builtin.debug:
+    msg: "/etc/default/tailscaled has been configured successfully"
+  when: tailscaled_config_result is succeeded
+
+- name: "tailscale | Restart tailscaled service"
+  ansible.builtin.systemd:
+    name: tailscaled.service
+    state: restarted
+    daemon_reload: yes
+  become: yes
+  register: service_restart_result
+
+- name: "tailscale | Display service restart result"
+  ansible.builtin.debug:
+    msg: "tailscaled.service has been restarted successfully"
+  when: service_restart_result is succeeded
+

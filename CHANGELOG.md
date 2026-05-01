@@ -5,6 +5,10 @@ All notable changes to the TailScale_deploy project will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-05-01
+### Added
+- Disable Tailscale automatic log sending to log.tailscale.com for enhanced privacy, security and lowering the network traffic. 
+
 ## [1.0.0] - 2026-02-13
 
 ### Added
